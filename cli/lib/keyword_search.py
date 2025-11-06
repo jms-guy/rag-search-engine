@@ -1,3 +1,4 @@
+import math
 from .index import InvertedIndex
 from .keyword_search_helpers import tokenize_text
 
@@ -28,3 +29,16 @@ def find_documents(index: InvertedIndex, doc_ids: set[int]) -> list[object]:
         movies.append(index.docmap[id])
 
     return movies
+
+def calc_idf(index: InvertedIndex, term: str) -> float:
+    tokens = tokenize_text(term)
+    if len(tokens) > 1:
+            raise Exception("Expecting single token for idf function")
+    term = tokens[0]
+
+    doc_count = len(index.docmap)
+    term_doc_set = index.index.get(term, set())
+    term_doc_count = len(term_doc_set)
+
+    idf_value = math.log((doc_count + 1) / (term_doc_count + 1))
+    return idf_value
