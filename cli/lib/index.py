@@ -81,13 +81,32 @@ class InvertedIndex:
 
         return bm25tf * bm25idf
     
-    def bm25_search(self, query: str, limit: int):
+    def bm25_search(self, query: str, limit: int) -> list:
         query_tokens = tokenize_text(query)
         scores = {}
+        relevant_docs = set()
 
-        for doc in self.docmap:
-            
-    
+        for token in query_tokens:
+            token_docs = self.index.get(token)
+            if token_docs == None:
+                continue
+            relevant_docs.update(token_docs)
+
+        for doc in relevant_docs:
+            scores[doc] = 0.0
+            for token in query_tokens:
+                if token not in self.index:
+                    continue
+                if doc not in self.index[token]:
+                    continue
+                token_bm25 = self.get_bm25(doc, token)
+                scores[doc] += token_bm25
+        
+        sorted_scores = sorted(scores.items(), key=lambda item: item[1], reverse=True)
+        sliced_scores = sorted_scores[:limit]
+
+        return sliced_scores
+
     def build(self, movies: list[dict]):
         for movie in movies:
             self.docmap[movie['id']] = movie
