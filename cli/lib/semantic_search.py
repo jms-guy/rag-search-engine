@@ -19,19 +19,18 @@ class SemanticSearch:
         self.document_map = {}
 
     def search(self, query: str, limit: int) -> list[dict]:
-        self.load_for_search()
-        print(f"Embeddings length: {len(self.embeddings)}")
-        print(f"Docmap length: {len(self.document_map)}")
+        query_embedding = self.generate_embedding([query])
+        query_vec = query_embedding[0]
 
-        query_embedding = self.generate_embedding(query)
-        similarity_scores = [cosine_similarity(query_embedding, doc_embedding) for doc_embedding in self.embeddings]
+        self.load_for_search()
+
+        similarity_scores = [cosine_similarity(query_vec, doc_vec) for doc_vec in self.embeddings]
         similarities = []
-        print(f"Similarity score length: {len(similarity_scores)}")
 
         for i in range(len(self.document_map)):
-            similarities.append((similarity_scores[i], self.document_map[i]))
+            similarities.append((similarity_scores[i], self.document_map[i + 1]))
 
-        sorted_scores = sorted(similarities, reverse=True)
+        sorted_scores = sorted(similarities, key=lambda x: x[0], reverse=True)
         sorted_scores = sorted_scores[:limit]
 
         results = [dict]

@@ -41,7 +41,9 @@ def main():
             model = SemanticSearch()
             results = model.search(args.query, args.limit)
             for i in range(len(results)):
-                print(f"{i}. {results[i]['title']} (score: {results[i]['score']})")
+                if i == 0:
+                    continue
+                print(f"{i}. {results[i]['title']} (score: {results[i]['score']:.4f})")
                 print(f"   {results[i]['description']}")
                 print()
 
