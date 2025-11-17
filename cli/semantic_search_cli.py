@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-from lib.semantic_search_helpers import embed_text, verify_embeddings, embed_query_text
+from lib.semantic_search_helpers import embed_text, verify_embeddings, embed_query_text, chunk_text
 from lib.semantic_search import verify_model, SemanticSearch
 
 def main():
@@ -20,6 +20,16 @@ def main():
     search_parser = subparsers.add_parser("search")
     search_parser.add_argument("query", type=str)
     search_parser.add_argument("--limit", type=int, default=5)
+
+    chunk_parser = subparsers.add_parser("chunk")
+    chunk_parser.add_argument("text", type=str)
+    chunk_parser.add_argument("--chunk-size", type=int, default=200)
+    chunk_parser.add_argument("--overlap", type=int, default=0)
+
+    chunk_parser = subparsers.add_parser("semantic_chunk")
+    chunk_parser.add_argument("text", type=str)
+    chunk_parser.add_argument("--chunk-size", type=int, default=4)
+    chunk_parser.add_argument("--overlap", type=int, default=0)
 
 
     args = parser.parse_args()
@@ -46,6 +56,13 @@ def main():
                 print(f"{i}. {results[i]['title']} (score: {results[i]['score']:.4f})")
                 print(f"   {results[i]['description']}")
                 print()
+
+        case "chunk":
+            chunks = chunk_text(args.text, args.chunk_size, args.overlap)
+            print(f"Chunking {len(args.text)} characters")
+            
+            for i in range(len(chunks)):
+                print(f"{i + 1}. {chunks[i]}")
 
         case _:
             parser.print_help()
