@@ -1,5 +1,6 @@
 from .semantic_search import SemanticSearch
 from .files import load_file
+import re
 
 def embed_text(text: str):
     if text == "":
@@ -44,4 +45,22 @@ def chunk_text(text: str, size: int, overlap: int) -> list:
         chunk_text = " ".join(chunk_words)
         chunks.append(chunk_text)
     
+    return chunks
+
+def semantic_chunk_text(text: str, size: int, overlap: int) -> list:
+    chunks = []
+    
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+
+    if overlap < 0:
+        raise ValueError("overlap cannot be negative")
+    
+    for i in range(0, len(sentences), size):
+        if i <= overlap:
+            chunk_sentences = sentences[i: i + size]
+        else:
+            chunk_sentences = sentences[i - overlap: i + size]
+        chunk_text = " ".join(chunk_sentences)
+        chunks.append(chunk_text)
+
     return chunks

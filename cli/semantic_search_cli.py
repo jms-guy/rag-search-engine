@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-from lib.semantic_search_helpers import embed_text, verify_embeddings, embed_query_text, chunk_text
+from lib.semantic_search_helpers import embed_text, verify_embeddings, embed_query_text, chunk_text, semantic_chunk_text
 from lib.semantic_search import verify_model, SemanticSearch
 
 def main():
@@ -28,7 +28,7 @@ def main():
 
     chunk_parser = subparsers.add_parser("semantic_chunk")
     chunk_parser.add_argument("text", type=str)
-    chunk_parser.add_argument("--chunk-size", type=int, default=4)
+    chunk_parser.add_argument("--max-chunk-size", type=int, default=4)
     chunk_parser.add_argument("--overlap", type=int, default=0)
 
 
@@ -61,6 +61,13 @@ def main():
             chunks = chunk_text(args.text, args.chunk_size, args.overlap)
             print(f"Chunking {len(args.text)} characters")
             
+            for i in range(len(chunks)):
+                print(f"{i + 1}. {chunks[i]}")
+
+        case "semantic_chunk":
+            chunks = semantic_chunk_text(args.text, args.max_chunk_size, args.overlap)
+            print(f"Semantically chunking {len(args.text)} characters")
+
             for i in range(len(chunks)):
                 print(f"{i + 1}. {chunks[i]}")
 
